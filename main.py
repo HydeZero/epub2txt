@@ -19,6 +19,7 @@ Use these commands (no sudo or privelage is needed):
 If this message is showing up on an executable, something went wrong when building and we will need a new executable.""")
     exit(1)
 
+# Opens an epub and returns the path to the extracted contents.
 def open_epub(epubpath):
     if not zipfile.is_zipfile(epubpath):
         raise ValueError("The provided file is not a valid epub (zip) file.")
@@ -26,6 +27,30 @@ def open_epub(epubpath):
     epub_extract_path = pathlib.Path.home().joinpath(".epub2txt_temp").joinpath(os.path.splitext(epubpath)[0].split("\\")[-1])
     epub.extractall(epub_extract_path)
     return epub_extract_path
+
+# Handles html parsing and text extraction from epub files.
+def extract_text_from_epub(epubpath):
+    epub_path = open_epub(epubpath)
+    all_text = ""
+    for root, dirs, files in os.walk(epub_path):
+        if args.verbose:
+            print(root + " Contents:")
+            print("files:", files)
+        for file in files:
+            if file.endswith(('.html', '.xhtml', '.htm')):
+                file_path = os.path.join(root, file)
+                if args.verbose:
+                    print(f"Processing file: {file_path}")
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    soup = BeautifulSoup(f, 'html.parser')
+                    text = soup.get_text(" ", strip=True)
+                    all_text += text + "\n"
+
+def extraction_handler(file_path):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        soup = BeautifulSoup(f, 'html.parser')
+        text = ""
+        
 
 if __name__ == "__main__":
     # Argument parsing
@@ -74,7 +99,7 @@ if __name__ == "__main__":
     if args.clean:
         if args.verbose:
             print("Cleaning up extracted text...")
-        all_text = txtcleaner.clean_text(all_text, is_verbose=args.verbose)
+        all_text = txtcleaner.clean_text(all_text, is_verbose=args.verbose, advanced_cleaning=True)
         if args.verbose:
             print("Text cleanup complete.")
     
@@ -90,10 +115,10 @@ if __name__ == "__main__":
     # Cleanup temporary extracted files
     
     # walk the directory tree and remove files and directories
-    for root, dirs, files in os.walk(epub_path, topdown=False):
-        for name in files:
-            os.remove(os.path.join(root, name))
-        for name in dirs:
-            os.rmdir(os.path.join(root, name))
-    os.rmdir(epub_path)
+    #for root, dirs, files in os.walk(epub_path, topdown=False):
+    #    for name in files:
+    #        os.remove(os.path.join(root, name))
+    #    for name in dirs:
+    #        os.rmdir(os.path.join(root, name))
+    #os.rmdir(epub_path)
     print("Cleanup complete.")
