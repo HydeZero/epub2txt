@@ -2,6 +2,8 @@ import zipfile
 import os
 import argparse
 import pathlib
+
+from soupsieve import SoupSieve
 import txtcleaner
 try:
     from bs4 import BeautifulSoup
@@ -46,6 +48,16 @@ def extract_text_from_epub(epubpath):
                     all_text = all_text + text + "\n"
     return all_text
 
+def recurse_div(soup, isVerbose=False):
+    for div in soup.find_all('div'):
+        for tag in soup.find_all(['b', 'i', 'u', 'em', 'strong', 'a', 'span', 'dl', 'dt', 'dd']):
+            tag.unwrap()
+        for tag in soup.find_all('div'):
+            if isVerbose:
+                print("Recursing into div...")
+            soup = recurse_div(tag, isVerbose)
+    return soup
+
 def extraction_handler(file_path):
     text = ""
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -53,43 +65,16 @@ def extraction_handler(file_path):
         body = soup.find('body')
         paragraphs = body.descendants
         # WHY WONT YOU WORK
-        for div_tag in soup.find_all('div'):
-            div_tag.unwrap()
-        for strong_tag in soup.find_all('strong'):
-            strong_tag.unwrap()
-        for em_tag in soup.find_all('em'):
-            em_tag.unwrap()
-        for a_tag in soup.find_all('a'):
-            a_tag.unwrap()
-        for span_tag in soup.find_all('span'):
-            span_tag.unwrap()
-        for dl_tag in soup.find_all('dl'):
-            dl_tag.unwrap()
-        for dt_tag in soup.find_all('dt'):
-            dt_tag.unwrap()
-        for dd_tag in soup.find_all('dd'):
-            dd_tag.unwrap()
-        soup.smooth()   
-    
+        for tag in soup.find_all(['b', 'i', 'u', 'em', 'strong', 'a', 'span', 'dl', 'dt', 'dd']):
+            tag.unwrap()
+        
+        soup = recurse_div(soup)
+        
         for p in paragraphs:
             soup = BeautifulSoup(str(p), 'html.parser')
             # Unwrap formatting tags
-            for div_tag in soup.find_all('div'):
-                div_tag.unwrap()
-            for strong_tag in soup.find_all('strong'):
-                strong_tag.unwrap()
-            for em_tag in soup.find_all('em'):
-                em_tag.unwrap()
-            for a_tag in soup.find_all('a'):
-                a_tag.unwrap()
-            for span_tag in soup.find_all('span'):
-                span_tag.unwrap()
-            for dl_tag in soup.find_all('dl'):
-                dl_tag.unwrap()
-            for dt_tag in soup.find_all('dt'):
-                dt_tag.unwrap()
-            for dd_tag in soup.find_all('dd'):
-                dd_tag.unwrap()
+            for tag in soup.find_all(['b', 'i', 'u', 'em', 'strong', 'a', 'span', 'dl', 'dt', 'dd']):
+                tag.unwrap()
             soup.smooth()
             soup_text = soup.find_all('p', recursive=False)
             for item in soup_text:
