@@ -11,7 +11,9 @@
 
 ## USAGE
 
-Make a virtual environment with `python3 -m venv .venv --prompt epub2txt`. Then activate the environment with `.venv\Scripts\Activate.ps1` for Windows PowerShell, `.venv\Scripts\activate.bat` for Windows CMD, or `source .venv/bin/activate` for Linux
+Make a virtual environment with `python3 -m venv .venv --prompt epub2txt`. Then activate the environment with `.venv\Scripts\Activate.ps1` for Windows PowerShell, `.venv\Scripts\activate.bat` for Windows CMD, or `source .venv/bin/activate` for Linux.
+
+Here is the help output for reference:
 
 ```
 epub2txt <epubfile> [-o <outputfile>] [-c]
