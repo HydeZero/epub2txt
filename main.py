@@ -66,7 +66,7 @@ if __name__ == "__main__":
                     print(f"Processing file: {file_path}")
                 with open(file_path, 'r', encoding='utf-8') as f:
                     soup = BeautifulSoup(f, 'html.parser')
-                    text = soup.get_text()
+                    text = soup.get_text(" ", strip=True)
                     all_text += text + "\n"
     
     # Optionally clean the extracted text
