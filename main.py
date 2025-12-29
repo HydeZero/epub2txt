@@ -2,8 +2,8 @@ import zipfile
 import os
 import argparse
 import pathlib
-
-from soupsieve import SoupSieve
+from markdownify import MarkdownConverter, BACKSLASH
+import strip_markdown
 import txtcleaner
 try:
     from bs4 import BeautifulSoup
@@ -43,9 +43,8 @@ def extract_text_from_epub(epubpath):
                 file_path = os.path.join(root, file)
                 if args.verbose:
                     print(f"Processing file: {file_path}")
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    text = extraction_handler(file_path)
-                    all_text = all_text + text + "\n"
+                text = extraction_handler(file_path)
+                all_text = all_text + text + "\n\n----------------\n\n"
     return all_text
 
 def recurse_div(soup, isVerbose=False):
@@ -58,32 +57,24 @@ def recurse_div(soup, isVerbose=False):
             soup = recurse_div(tag, isVerbose)
     return soup
 
+# Convert BeautifulSoup object to markdown text.
+# This is the default recommended function in the markdownify pip page.
+def md(soup, **options):
+    return MarkdownConverter(**options).convert_soup(soup)
+
 def extraction_handler(file_path):
     text = ""
     with open(file_path, 'r', encoding='utf-8') as f:
+        
         soup = BeautifulSoup(f, 'html.parser')
+        
         body = soup.find('body')
-        paragraphs = body.descendants
-        # WHY WONT YOU WORK
-        for tag in soup.find_all(['b', 'i', 'u', 'em', 'strong', 'a', 'span', 'dl', 'dt', 'dd']):
-            tag.unwrap()
         
-        soup = recurse_div(soup)
+        text = md(body)
         
-        for p in paragraphs:
-            soup = BeautifulSoup(str(p), 'html.parser')
-            # Unwrap formatting tags
-            for tag in soup.find_all(['b', 'i', 'u', 'em', 'strong', 'a', 'span', 'dl', 'dt', 'dd']):
-                tag.unwrap()
-            soup.smooth()
-            soup_text = soup.find_all('p', recursive=False)
-            for item in soup_text:
-                if item.name == 'br':
-                    text = text + "\n"
-                if item.name == 'p' or item.name == 'div':
-                    text = text + p.get_text(separator=" ",strip=True)
-                text = text + "\n"
+        text = strip_markdown.strip_markdown(text)
         
+        # Now remove excessive new lines
         new_text = []
         for line in text.splitlines():
             if line == "\n" or line.strip() == "":
