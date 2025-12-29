@@ -12,24 +12,10 @@ Please ensure txtcleaner.py is in the same directory as this script.""")
     exit(1)
 try:
     from bs4 import BeautifulSoup
-except ImportError:
-    print("""Error: BeautifulSoup4 is required to run this script. Please install it using 'pip install beautifulsoup4'.
-          
-It is highly recommended to install it in a virtual environment to avoid breaking other projects.
-If you are NOT in a virtual environment already, use these commands (no sudo or privelage is needed):
-    > python -m venv .venv --prompt epub2txt
-    > source .venv/bin/activate  # On Linux
-    > .venv\\Scripts\\Activate.ps1 # On Windows PowerShell
-    > .venv\\Scripts\\activate.bat # On Windows CMD
-    > pip install beautifulsoup4
-    
-If this message is showing up on an executable, something went wrong when building and we will need a new executable.""")
-    exit(1)
-try:
     from markdownify import MarkdownConverter
     import strip_markdown
 except ImportError:
-    print("""Error: markdownify and strip_markdown are required to run this script. Please install them using 'pip install markdownify strip-markdown'.
+    print("""Error: BeautifulSoup4, markdownify, and strip-markdown is required to run this script. They have not been found. Please install them using 'pip install beautifulsoup4 markdownify strip-markdown' or 'pip install -r requirements.txt' if the file is there.
           
 It is highly recommended to install it in a virtual environment to avoid breaking other projects.
 If you are NOT in a virtual environment already, use these commands (no sudo or privelage is needed):
@@ -37,7 +23,7 @@ If you are NOT in a virtual environment already, use these commands (no sudo or 
     > source .venv/bin/activate  # On Linux
     > .venv\\Scripts\\Activate.ps1 # On Windows PowerShell
     > .venv\\Scripts\\activate.bat # On Windows CMD
-    > pip install markdownify strip-markdown
+    > pip install beautifulsoup4 markdownify strip-markdown
     
 If this message is showing up on an executable, something went wrong when building and we will need a new executable.""")
     exit(1)
