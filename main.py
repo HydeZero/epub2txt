@@ -74,7 +74,7 @@ if __name__ == "__main__":
     if args.clean:
         if args.verbose:
             print("Cleaning up extracted text...")
-        all_text = txtcleaner.clean_text(all_text)
+        all_text = txtcleaner.clean_text(all_text, is_verbose=args.verbose)
         if args.verbose:
             print("Text cleanup complete.")
     
