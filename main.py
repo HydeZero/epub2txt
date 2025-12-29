@@ -42,15 +42,70 @@ def extract_text_from_epub(epubpath):
                 if args.verbose:
                     print(f"Processing file: {file_path}")
                 with open(file_path, 'r', encoding='utf-8') as f:
-                    soup = BeautifulSoup(f, 'html.parser')
-                    text = soup.get_text(" ", strip=True)
-                    all_text += text + "\n"
+                    text = extraction_handler(file_path)
+                    all_text = all_text + text + "\n"
+    return all_text
 
 def extraction_handler(file_path):
+    text = ""
     with open(file_path, 'r', encoding='utf-8') as f:
         soup = BeautifulSoup(f, 'html.parser')
-        text = ""
+        body = soup.find('body')
+        paragraphs = body.descendants
+        # WHY WONT YOU WORK
+        for div_tag in soup.find_all('div'):
+            div_tag.unwrap()
+        for strong_tag in soup.find_all('strong'):
+            strong_tag.unwrap()
+        for em_tag in soup.find_all('em'):
+            em_tag.unwrap()
+        for a_tag in soup.find_all('a'):
+            a_tag.unwrap()
+        for span_tag in soup.find_all('span'):
+            span_tag.unwrap()
+        for dl_tag in soup.find_all('dl'):
+            dl_tag.unwrap()
+        for dt_tag in soup.find_all('dt'):
+            dt_tag.unwrap()
+        for dd_tag in soup.find_all('dd'):
+            dd_tag.unwrap()
+        soup.smooth()   
+    
+        for p in paragraphs:
+            soup = BeautifulSoup(str(p), 'html.parser')
+            # Unwrap formatting tags
+            for div_tag in soup.find_all('div'):
+                div_tag.unwrap()
+            for strong_tag in soup.find_all('strong'):
+                strong_tag.unwrap()
+            for em_tag in soup.find_all('em'):
+                em_tag.unwrap()
+            for a_tag in soup.find_all('a'):
+                a_tag.unwrap()
+            for span_tag in soup.find_all('span'):
+                span_tag.unwrap()
+            for dl_tag in soup.find_all('dl'):
+                dl_tag.unwrap()
+            for dt_tag in soup.find_all('dt'):
+                dt_tag.unwrap()
+            for dd_tag in soup.find_all('dd'):
+                dd_tag.unwrap()
+            soup.smooth()
+            soup_text = soup.find_all('p', recursive=False)
+            for item in soup_text:
+                if item.name == 'br':
+                    text = text + "\n"
+                if item.name == 'p' or item.name == 'div':
+                    text = text + p.get_text(separator=" ",strip=True)
+                text = text + "\n"
         
+        new_text = []
+        for line in text.splitlines():
+            if line == "\n" or line.strip() == "":
+                continue
+            stripped_line = line.strip()
+            new_text.append(stripped_line)
+        return "\n".join(new_text)
 
 if __name__ == "__main__":
     # Argument parsing
@@ -80,19 +135,7 @@ if __name__ == "__main__":
     all_text = ""
     
     # Walk through the extracted epub files and extract text from HTML/XHTML files
-    for root, dirs, files in os.walk(epub_path):
-        if args.verbose:
-            print(root + " Contents:")
-            print("files:", files)
-        for file in files:
-            if file.endswith(('.html', '.xhtml', '.htm')):
-                file_path = os.path.join(root, file)
-                if args.verbose:
-                    print(f"Processing file: {file_path}")
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    soup = BeautifulSoup(f, 'html.parser')
-                    text = soup.get_text(" ", strip=True)
-                    all_text += text + "\n"
+    all_text = extract_text_from_epub(epubpath)
     
     # Optionally clean the extracted text
     print("Finished extracting text from epub.")
