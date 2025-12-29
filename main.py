@@ -71,7 +71,7 @@ def extract_text_from_epub(epubpath):
                 if args.verbose:
                     print(f"Processing file: {file_path}")
                 text = extraction_handler(file_path)
-                # Add a chapter splitter for readability.
+                # Add a file splitter for readability. File splits may be chapters or just sections depending on the epub structure.
                 all_text = all_text + text + "\n\n\n\n----------------\n\n\n\n"
     return all_text
 
