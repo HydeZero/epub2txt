@@ -105,7 +105,7 @@ def extraction_handler(file_path):
                 continue
             stripped_line = line.strip()
             new_text.append(stripped_line)
-        return "\n".join(new_text)
+        return "\n\n".join(new_text)
 
 if __name__ == "__main__":
     # Argument parsing
