@@ -16,16 +16,21 @@ Make a virtual environment with `python3 -m venv .venv --prompt epub2txt`. Then 
 Here is the help output for reference:
 
 ```
-epub2txt <epubfile> [-o <outputfile>] [-c]
+usage: epub2txt <epubfile> [-o <outputfile>] [-c] [-a] [-k] [-v] [-l <list_to_keep>]
+
+Extracts all text from an epub file and (optionally) cleans it up.
 
 positional arguments:
-  epubfile             Path to the epub file to extract text from.
+  epubfile              Path to the epub file to extract text from.
 
 options:
-  -h, --help           show this help message and exit
-  -o, --output OUTPUT  Path to the output text file. Defaults to the same name as the epub file with a .txt extension.
-  -c, --clean          Clean up the extracted text. By default off.
-  -v, --verbose        Enable verbose output for debugging purposes.
+  -h, --help            show this help message and exit
+  -o, --output OUTPUT   Path to the output text file. Defaults to the same name as the epub file with a .txt extension.
+  -c, --clean           Clean up the extracted text. By default off.
+  -v, --verbose         Enable verbose output for debugging purposes.
+  -a, --advanced-cleaning Enable advanced cleaning mode in text cleaner, removing everything outside of the Basic Latin range. Only works if the --clean flag is set.
+  -k, --keep-accents    Keep accented characters during cleaning. Only works if the --clean flag is set.
+  -l, --list-to-keep [LIST_TO_KEEP ...] List of characters to keep during cleaning, even if they are not in the acceptable utf-8 characters list. Only works if the --clean flag is set. Supply as a space-separated list of characters without quotes or brackets surrounding them.
 ```
 
 ### EXAMPLE USAGE:

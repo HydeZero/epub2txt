@@ -151,10 +151,12 @@ def clean_text(text, is_verbose=False, advanced_cleaning=False, keep_accents=Fal
             continue
         if character == "\n":
             continue # allow new lines
-        if character in list_to_keep:
+        if list_to_keep is not None and character in list_to_keep:
             continue
         if advanced_cleaning:
             if ord(character) >= 128:
+                if keep_accents and character in accented_replacements.keys():
+                    continue # if we are keeping accents and the character is an accented character, we allow it, even though it's outside the basic latin range
                 # If unicode code point is 128 or higher, replace with space since it's outside the basic latin range.
                 text[i] = " "
                 if is_verbose:

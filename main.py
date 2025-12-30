@@ -97,11 +97,14 @@ def extraction_handler(file_path):
 
 if __name__ == "__main__":
     # Argument parsing
-    argparser = argparse.ArgumentParser(prog="epub2txt", description="Extracts all text from an epub file and (optionally) cleans it up.", usage="epub2txt <epubfile> [-o <outputfile>] [-c]")
+    argparser = argparse.ArgumentParser(prog="epub2txt", description="Extracts all text from an epub file and (optionally) cleans it up.", usage="epub2txt <epubfile> [-o <outputfile>] [-c] [-a] [-k] [-v] [-l <list_to_keep>]")
     argparser.add_argument("epubfile", help="Path to the epub file to extract text from.")
     argparser.add_argument("-o", "--output", help="Path to the output text file. Defaults to the same name as the epub file with a .txt extension.")
     argparser.add_argument("-c", "--clean", action="store_true", help="Clean up the extracted text. By default off.")
     argparser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output for debugging purposes.")
+    argparser.add_argument('-a', '--advanced-cleaning', action='store_true', help='Enable advanced cleaning mode in text cleaner, removing everything outside of the Basic Latin range. Only works if the --clean flag is set.')
+    argparser.add_argument('-k', '--keep-accents', action='store_true', help='Keep accented characters during cleaning. Only works if the --clean flag is set.')
+    argparser.add_argument('-l', '--list-to-keep', nargs='*', help='List of characters to keep during cleaning, even if they are not in the acceptable utf-8 characters list. Only works if the --clean flag is set. Supply as a space-separated list of characters without quotes or brackets surrounding them.')
     
     # Try to parse arguments and handle errors.
     try:
@@ -110,7 +113,6 @@ if __name__ == "__main__":
         print("Error parsing arguments:", e)
         argparser.print_help()
         exit(1)
-        
     # Determine output file path
     epubpath = args.epubfile
     if args.output:
@@ -132,7 +134,7 @@ if __name__ == "__main__":
     print("Finished extracting text from epub.")
     if args.clean:
         print("Cleaning up extracted text...")
-        all_text = txtcleaner.clean_text(all_text, is_verbose=args.verbose, advanced_cleaning=True)
+        all_text = txtcleaner.clean_text(all_text, is_verbose=args.verbose, advanced_cleaning=args.advanced_cleaning, keep_accents=args.keep_accents, list_to_keep=args.list_to_keep)
         print("Text cleanup complete.")
     
     # Finally, write the extracted (and possibly cleaned) text to the output file
