@@ -112,11 +112,18 @@ accented_replacements = {
 # This list contains utf-8 characters that SHOULD be printed everywhere with basic utf-8 support (items listed in groups shown in the utf-8 lookup table, so special characters, capital letters, more special characters, lowercase letters, and finally more special characters. Anything beyond or before this are either not common or control characters that should be removed.)
 list_of_acceptable_utf_8_characters = ("!\"#$%&'()*+,-./0123456789:;<=>?@", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "[\\]^_`", "abcdefghijklmnopqrstuvwxyz", "{|}~")
 
-def clean_text(text, is_verbose=False, advanced_cleaning=False, keep_accents=False):
+def clean_text(text, is_verbose=False, advanced_cleaning=False, keep_accents=False, list_to_keep=None):
     # Do an initial cleanup replacement based on the cleanup dictionary.
     for target, replacement in cleanup_dictionary.items():
         if list_to_keep is None or target not in list_to_keep:
             text = text.replace(target, replacement)
+    # Next, handle accented character replacements if keep_accents is False.
+    if not keep_accents:
+        for target, replacement in accented_replacements.items():
+            if list_to_keep is None or target not in list_to_keep:
+                text = text.replace(target, replacement)
+    
+    # define the acceptable utf-8 character groups for checking
     
     special_character = list_of_acceptable_utf_8_characters[0]
     capital_letter = list_of_acceptable_utf_8_characters[1]
@@ -130,8 +137,8 @@ def clean_text(text, is_verbose=False, advanced_cleaning=False, keep_accents=Fal
     # Now remove any characters that are not in the acceptable utf-8 characters list.
     for i in range(len(text)):
         character = text[i]
-        # please forgive me for this long for statement, it is just for simplicity.
         # anyway this checks if the character is in any of the acceptable utf-8 characters, and if it is not, it replaces it with a space.
+        # This is a final sanity check to ensure that only desired characters remain in the text.
         if character in special_character:
             continue
         if character in capital_letter:
@@ -144,6 +151,8 @@ def clean_text(text, is_verbose=False, advanced_cleaning=False, keep_accents=Fal
             continue
         if character == "\n":
             continue # allow new lines
+        if character in list_to_keep:
+            continue
         if advanced_cleaning:
             if ord(character) >= 128:
                 # If unicode code point is 128 or higher, replace with space since it's outside the basic latin range.
@@ -156,4 +165,4 @@ def clean_text(text, is_verbose=False, advanced_cleaning=False, keep_accents=Fal
         if is_verbose:
             print(f"Replaced character: {character} with space.")
             
-    return "".join(text)
+    return "".join(text) # Join the list back into a single string and return it.
