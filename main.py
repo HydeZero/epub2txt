@@ -70,7 +70,7 @@ def md(soup, **options):
 def extraction_handler(file_path):
     text = ""
     with open(file_path, 'r', encoding='utf-8') as f:
-        # Make the BeautifulSoup object from the file.        
+        # Make the BeautifulSoup object from the file.
         soup = BeautifulSoup(f, 'html.parser')
         # Extract the body content.
         body = soup.find('body')
@@ -78,6 +78,8 @@ def extraction_handler(file_path):
         text = md(body)
         # Finally, remove the markdown formatting to get plain text.
         text = strip_markdown.strip_markdown(text)
+        if args.verbose:
+            print(f"Extracted {len(text)} characters from {file_path}")
         
         # Now remove excessive new lines
         new_text = []
@@ -89,6 +91,8 @@ def extraction_handler(file_path):
             stripped_line = line.strip()
             new_text.append(stripped_line)
         # Collapse the new text list back into a single string with double new lines.
+        if args.verbose:
+            print(f"After cleanup, {len(new_text)} lines remain from {file_path}")
         return "\n\n".join(new_text)
 
 if __name__ == "__main__":
@@ -127,11 +131,9 @@ if __name__ == "__main__":
     # Optionally clean the extracted text
     print("Finished extracting text from epub.")
     if args.clean:
-        if args.verbose:
-            print("Cleaning up extracted text...")
+        print("Cleaning up extracted text...")
         all_text = txtcleaner.clean_text(all_text, is_verbose=args.verbose, advanced_cleaning=True)
-        if args.verbose:
-            print("Text cleanup complete.")
+        print("Text cleanup complete.")
     
     # Finally, write the extracted (and possibly cleaned) text to the output file
     with open(outputpath, 'w', encoding='utf-8') as out_file:
@@ -140,7 +142,7 @@ if __name__ == "__main__":
     print(f"Extracted text written to: {outputpath}")
     
     print("DONE!")
-    print("Beginning cleanup...")
+    print("Beginning work cleanup...")
     
     # Cleanup temporary extracted files
     
